@@ -1,0 +1,6 @@
+{
+  "name": "DigiKiot: Photo Management",
+  "description": "Upload images directly from your device to Google Drive via Google Apps Script integration.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}
