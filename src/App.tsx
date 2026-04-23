@@ -3,14 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Upload, 
-  Settings, 
   Image as ImageIcon, 
   CheckCircle2, 
   AlertCircle, 
-  ExternalLink,
   ChevronRight,
   ChevronLeft,
   Database,
@@ -136,10 +134,9 @@ interface UploadedFile {
 const CATEGORIES = ["Tất cả", "Camera", "Máy tính", "Phụ kiện", "Khác"];
 
 export default function App() {
-  const [gasUrl, setGasUrl] = useState<string>(() => localStorage.getItem('gasUrl') || 'https://script.google.com/macros/s/AKfycbzp349z2ws3yeehY2t4Gzc6wHV_yoXSZAlhRpRcbd2JyVLtaWh33klSlief5MCybflmpg/exec');
+  const [gasUrl, setGasUrl] = useState<string>('https://script.google.com/macros/s/AKfycbxd7cJ1aMqNOkw0qwHT4pzVZQ59xilIa_IpR5gkvSTAnKOQVXpWNoiHtGA6NnplRgzdew/exec');
   const [folderId, setFolderId] = useState<string>(() => localStorage.getItem('folderId') || '');
-  const [sheetId, setSheetId] = useState<string>(() => localStorage.getItem('sheetId') || '1BvCMwAq5zItV3fEqAy1saP7eTMQ66orrZ4CG6H_ecgM');
-  const [isConfiguring, setIsConfiguring] = useState(!gasUrl);
+  const [sheetId, setSheetId] = useState<string>('1BvCMwAq5zItV3fEqAy1saP7eTMQ66orrZ4CG6H_ecgM');
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<{ type: 'success' | 'error' | null, msg: string }>({ type: null, msg: '' });
@@ -207,14 +204,12 @@ export default function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem('gasUrl', gasUrl);
     localStorage.setItem('folderId', folderId);
-    localStorage.setItem('sheetId', sheetId);
     
     if (gasUrl && sheetId) {
       fetchRemoteFiles(currentPage, itemsPerPage);
     }
-  }, [gasUrl, folderId, sheetId, currentPage, itemsPerPage]);
+  }, [folderId, currentPage, itemsPerPage]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
     let file: File | null = null;
@@ -328,84 +323,10 @@ export default function App() {
             )} />
             {gasUrl ? 'Online' : 'Offline'}
           </div>
-
-          <button 
-            onClick={() => setIsConfiguring(!isConfiguring)}
-            className={cn(
-              "p-1.5 rounded-lg transition-all duration-300 border shadow-sm outline-none",
-              isConfiguring 
-                ? "bg-blue-600 border-blue-500 text-white shadow-blue-200" 
-                : "bg-white border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:bg-zinc-50"
-            )}
-          >
-            <Settings size={16} className={cn("transition-transform duration-500", isConfiguring && "rotate-90")} />
-          </button>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-3 auto-rows-min">
-        {/* Settings Panel */}
-        <AnimatePresence>
-          {isConfiguring && (
-            <motion.section
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="md:col-span-12 lg:col-span-4 lg:row-span-2 bg-white rounded-[32px] border border-zinc-200 p-8 shadow-sm relative overflow-hidden flex flex-col"
-            >
-              <div className="mb-8 relative z-10">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-5 shadow-sm border border-blue-100">
-                  <Database size={20} />
-                </div>
-                <h2 className="font-bold text-xl text-zinc-900 tracking-tight">Cấu hình Script</h2>
-                <p className="text-xs text-zinc-500 mt-2 leading-relaxed">Kết nối thiết bị với bộ lưu trữ Google Drive của bạn.</p>
-              </div>
-
-              <div className="space-y-5 flex-1 relative z-10">
-                <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">Đường dẫn Web App URL</label>
-                  <input 
-                    type="text" 
-                    value={gasUrl}
-                    onChange={(e) => setGasUrl(e.target.value)}
-                    placeholder="https://script.google.com/macros/..."
-                    className="w-full bg-zinc-50 border border-zinc-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all rounded-2xl py-3 px-4 outline-none text-sm font-medium"
-                  />
-                </div>
-                
-                <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">ID Thư mục đích</label>
-                  <input 
-                    type="text" 
-                    value={folderId}
-                    onChange={(e) => setFolderId(e.target.value)}
-                    placeholder="Để trống cho thư mục gốc"
-                    className="w-full bg-zinc-50 border border-zinc-200 focus:border-blue-500 transition-all rounded-2xl py-3 px-4 outline-none text-xs"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 ml-1">ID Bảng tính (Sheet)</label>
-                  <input 
-                    type="text" 
-                    value={sheetId}
-                    onChange={(e) => setSheetId(e.target.value)}
-                    placeholder="Để ghi nhật ký ảnh"
-                    className="w-full bg-zinc-50 border border-zinc-200 focus:border-blue-500 transition-all rounded-2xl py-3 px-4 outline-none text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-zinc-100 flex items-center justify-between relative z-10 text-[10px]">
-                <span className="font-bold text-zinc-300">v2.0 Sync</span>
-                <a href="https://script.google.com" target="_blank" className="text-blue-600 font-bold hover:underline flex items-center gap-1">
-                  Mở GAS Console <ExternalLink size={10} />
-                </a>
-              </div>
-            </motion.section>
-          )}
-        </AnimatePresence>
-
         {/* Upload Area */}
         <section className={cn(
           "bg-white border border-zinc-200 rounded-xl p-1.5 shadow-sm transition-all duration-500 relative overflow-hidden flex flex-col items-center justify-center md:col-span-12 lg:col-span-6",
@@ -516,8 +437,7 @@ export default function App() {
         </section>
 
         {/* Remote Stats - Compact */}
-        {!isConfiguring && (
-          <section className="md:col-span-6 lg:col-span-3 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl p-3 shadow-lg flex items-center justify-between overflow-hidden relative border-none">
+        <section className="md:col-span-6 lg:col-span-3 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl p-3 shadow-lg flex items-center justify-between overflow-hidden relative border-none">
             <div className="absolute -right-2 -bottom-2 opacity-15 text-white pointer-events-none">
               <ImageIcon size={60} />
             </div>
@@ -529,7 +449,6 @@ export default function App() {
               </div>
             </div>
           </section>
-        )}
 
         {/* System Integrity - Compact */}
         <section className={cn(
@@ -621,12 +540,18 @@ export default function App() {
                       alert(`Đã copy link: ${item.name}`);
                     }}
                   >
-                    <img 
-                      src={item.url} 
-                      alt={item.name} 
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+                    {item.url ? (
+                      <img 
+                        src={item.url} 
+                        alt={item.name} 
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-zinc-100 text-zinc-300">
+                        <ImageIcon size={24} />
+                      </div>
+                    )}
                     
                     <div className="absolute top-2 left-2 z-10">
                       <span className="px-2 py-0.5 bg-black/40 backdrop-blur-md rounded-lg text-[7px] font-black uppercase text-white tracking-widest border border-white/10">
